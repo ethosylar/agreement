@@ -10,7 +10,7 @@ if (!isset($_SESSION['department'])) {
 
 $department = $_SESSION['department'];
 // Define categories
-$categories = ["licensing", "tenant", "services", "outsource", "biomedical-facilities", "marcomm", "clinical", "support"];
+$categories = ["licensing", "tenant", "services", "outsource", "biomedical-facilities", "marcomm/insurance", "clinical", "service & support maintenance"];
 
 // Function to execute SQL query and return result
 function executeQuery($query) {
@@ -21,6 +21,19 @@ function executeQuery($query) {
     }
     return $result;
 }
+$today = date('Y-m-d');
+$updateQuery = "UPDATE form 
+                SET status = CASE 
+                    WHEN endDate >= ? THEN 'Active' 
+                    ELSE 'Expired' 
+                END 
+                WHERE department = ?";
+
+$updateStmt = $connection->prepare($updateQuery);
+$updateStmt->bind_param("ss", $today, $department);
+$updateStmt->execute();
+$updateStmt->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -35,9 +48,23 @@ function executeQuery($query) {
     <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="shortcut icon" type="x-icon" href="hsptl.png">
-    <link rel="stylesheet" href="sidebar.css">
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-size: cover;
+            background-position: center;
+            color: white;
+        }
   /* Table Styles */
         .center-table {
             display: flex;
@@ -207,7 +234,122 @@ function executeQuery($query) {
         .navbar .navdiv .breadcrumb li a.active {
             color: blue;
         }
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 100%;
+            background-color: blue;
+            backdrop-filter: blur(50px);
+            border-right: 2px solid rgba(225, 225, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            padding: 6px 14px;
+            transition: width 0.5s ease;
+            z-index: 10;
+        }
 
+        .sidebar.active {
+            width: 260px;
+        }
+
+        .sidebar .logo-menu {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 70px;
+        }
+
+        .sidebar .logo-menu .menu {
+            font-size: 25px;
+            color: black;
+            pointer-events: none;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .sidebar.active .logo-menu .menu {
+            opacity: 1;
+            transition-delay: 0.2s;
+        }
+
+        .sidebar .logo-menu .toggle-btn {
+            position: absolute;
+            top: 20px; /* Adjusted top for better alignment */
+            left: 25%; /* Adjusts correctly when sidebar is active */
+            width: 40px;
+            height: 40px;
+            font-size: 22px;
+            color: white;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+            transition: 0.5s;
+            z-index: 100; /* Ensure it stays on top */
+        }
+
+        .sidebar.active .logo-menu .toggle-btn {
+            left: 80%; /* Adjusted for the active sidebar */
+        }
+
+        .sidebar .list {
+            margin-top: 10px;
+        }
+
+        .sidebar .list .list-item {
+            list-style: none;
+            width: 100%;
+            height: 50px;
+            margin: 5px 0;
+            line-height: 50px;
+        }
+
+        .sidebar .list .list-item a {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.5s;
+        }
+
+        .sidebar .list .list-item.active a,
+        .sidebar .list .list-item a:hover {
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .sidebar .list .list-item a i {
+            min-width: 50px;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+        }
+
+        .sidebar .link-name {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar.active .link-name {
+            opacity: 1;
+            pointer-events: auto;
+            transition-delay: calc(0.1s * var(--i));
+        }
+
+        .sidebar .list-item:hover ~ .sidebar {
+            width: 260px;
+        }
+        
+        .sidebar .list-item:hover .link-name {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .sidebar .list-item a:hover .link-name {
+            color: black; /* Change to your desired hover color */
+        }
     </style>
     <script>
 
@@ -225,6 +367,15 @@ function executeQuery($query) {
                 $('.sidebar').toggleClass('active');
             });
         });
+            document.querySelectorAll(".list-item").forEach(item => {
+            item.addEventListener("mouseenter", () => {
+                document.querySelector(".sidebar").classList.add("active");
+            });
+
+            item.addEventListener("mouseleave", () => {
+                document.querySelector(".sidebar").classList.remove("active");
+            });
+        });
 
         document.addEventListener("DOMContentLoaded", function() {
         const table = document.querySelector(".center-table tbody");
@@ -237,7 +388,7 @@ function executeQuery($query) {
             for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
                 const cell = rows[rowIndex].cells[colIndex]; // Get the cell at the specific column index
 
-                if (colIndex === 8) { // Adjust this index if the target column position changes
+                if (colIndex === 10) { // Adjust this index if the target column position changes
                     const monthsLeft = parseInt(cell.textContent.trim(), 10); // Ensure trimming whitespace
 
                     if (!isNaN(monthsLeft)) { // Check if the value is a valid number
@@ -292,7 +443,7 @@ function executeQuery($query) {
             <li class="list-item">
                 <a href="terminate.php">
                     <i class='bx bx-folder-minus'></i>
-                    <span class="link-name" style="--i:4;">Terminate</span>
+                    <span class="link-name" style="--i:4;">Archive</span>
                 </a>
             </li>
             <li class="list-item">
@@ -322,13 +473,15 @@ function executeQuery($query) {
                 <thead>
                     <tr>
                         <th>Category</th>
-                        <th>PIC</th>
-                        <th>Service</th>
-                        <th>Company/Act</th>
+                        <th>PIC/Owner Name</th>
+                        <th>Services</th>
+                        <th>Company Name/Act Name</th>
                         <th>Start Date</th>
                         <th>End Date</th>
-                        <th>Rental</th>
+                        <th>Amount(RM)</th>
                         <th>Remarks</th>
+                        <th>Duration</th>
+                        <th>Status</th>
                         <th>Months Left Before End</th>
                         <th>Actions</th>
                     </tr>
@@ -337,7 +490,7 @@ function executeQuery($query) {
                 <tbody>
                     <?php
                     // Prepare the SQL statement
-                    $stmt = $connection->prepare("SELECT id, category, pic, service, company, start, endDate, rent, remarks, monthsLeft, filename, department FROM form WHERE department = ?");
+                    $stmt = $connection->prepare("SELECT id, status, category, pic, service, company, start, endDate, rent, remarks, monthsLeft, filename, department, duration FROM form WHERE department = ?");
                     if (!$stmt) {
                         die("Prepare failed: " . $connection->error);
                     }
@@ -366,10 +519,12 @@ function executeQuery($query) {
                             echo "<td>" . htmlspecialchars($row["pic"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["service"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["company"]) . "</td>";
-                            echo "<td>" . htmlspecialchars($row["start"]) . "</td>";
-                            echo "<td>" . htmlspecialchars($row["endDate"]) . "</td>";
+                            echo "<td>" . date("d/m/Y", strtotime($row["start"])) . "</td>";
+                            echo "<td>" . date("d/m/Y", strtotime($row["endDate"])) . "</td>";
                             echo "<td>" . htmlspecialchars($row["rent"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["remarks"]) . "</td>";
+                            echo "<td>" . htmlspecialchars($row["duration"]) . "</td>";
+                            echo "<td>" . htmlspecialchars($row["status"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["monthsLeft"]) . "</td>";
                             // Check if 'id' exists before accessing it
                             echo "<td>
@@ -379,7 +534,7 @@ function executeQuery($query) {
                         </form>
                         <form action='terminate.php' method='post' style='display:inline;'>
                             <input type='hidden' name='id' value='" . htmlspecialchars($row['id']) . "'>
-                            <button type='submit' class='btn'>Terminate</button>
+                            <button type='submit' class='btn'>Archive</button>
                         </form>
                             </td>";
 

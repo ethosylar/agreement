@@ -113,15 +113,16 @@ $stmt->close();
         <tr><th>Category:</th><td><?php echo htmlspecialchars($row['category']); ?></td></tr>
         <tr><th>PIC:</th><td><?php echo htmlspecialchars($row['pic']); ?></td></tr>
         <tr><th>Services:</th><td><?php echo htmlspecialchars($row['service']); ?></td></tr>
-        <tr><th>Company/Act:</th><td><?php echo htmlspecialchars($row['company']); ?></td></tr>
-        <tr><th>Start Date:</th><td><?php echo htmlspecialchars($row['start']); ?></td></tr>
-        <tr><th>End Date:</th><td><?php echo htmlspecialchars($row['endDate']); ?></td></tr>
+        <tr><th>Company Name/Act Name:</th><td><?php echo htmlspecialchars($row['company']); ?></td></tr>
+        <tr><th>Start Date:</th><td><?php echo date("d/m/Y", strtotime($row["start"])); ?></td></tr>
+        <tr><th>End Date:</th><td><?php echo date("d/m/Y", strtotime($row["endDate"])); ?></td></tr>
         <tr><th>SQFT:</th><td><?php echo htmlspecialchars($row['sqft']); ?></td></tr>
-        <tr><th>Rental:</th><td><?php echo htmlspecialchars($row['rent']); ?></td></tr>
+        <tr><th>Amount(RM):</th><td><?php echo htmlspecialchars($row['rent']); ?></td></tr>
         <tr><th>Remarks:</th><td><?php echo htmlspecialchars($row['remarks']); ?></td></tr>
+        <tr><th>Duration:</th><td><?php echo htmlspecialchars($row['duration']); ?></td></tr>
         <tr><th>Months Left Before Ends:</th><td><?php echo htmlspecialchars($row['monthsLeft']); ?></td></tr>
         <tr><th>Document:</th>
-            <td>
+        <td>
                 <?php
                 if (!empty($row['filename'])) {
                     // Handle multiple filenames (comma-separated)

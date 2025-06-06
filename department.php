@@ -42,7 +42,9 @@ while ($row = mysqli_fetch_assoc($result)) {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="shortcut icon" type="x-icon" href="hsptl.png">
     <link rel="stylesheet" href="style.css">
+
     <style>
+        
         body {
             color: black; /* Ensure text is visible */
             font-family: 'Poppins', sans-serif;
@@ -104,11 +106,20 @@ while ($row = mysqli_fetch_assoc($result)) {
     </style>
     <script>
         $(document).ready(function () {
+            var table = $('#example').DataTable();
+
+            // Filter table based on category selection
+            $('#categoryFilter').on('change', function () {
+                var selectedCategory = $(this).val();
+                table.column(0).search(selectedCategory).draw();
+            });
+
             // Toggle sidebar
             $('.toggle-btn').click(function () {
                 $('.sidebar').toggleClass('active');
             });
-
+        });
+                
             // Handle View Records button click
             $('.view-records-btn').on('click', function () {
                 var department = $(this).data('department');
@@ -126,7 +137,6 @@ while ($row = mysqli_fetch_assoc($result)) {
     </script>
 </head>
 <body>
-
 <nav class="navbar">
     <div class="navdiv">
         <h2>Departments</h2>
@@ -138,6 +148,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     </div>
 </nav>
 
+<div class="wrapper">
     <div class="sidebar">
         <div class="logo-menu">
             <h2 class="menu" style="color: white;">Menu</h2>
@@ -147,31 +158,31 @@ while ($row = mysqli_fetch_assoc($result)) {
             <li class="list-item">
                 <a href="home.php">
                     <i class='bx bx-home'></i>
-                    <span class="link-name">Dashboard</span>
+                    <span class="link-name" style="--i:1;">Dashboard</span>
                 </a>
             </li>
             <li class="list-item">
                 <a href="dashboard.php">
                     <i class='bx bx-file'></i>
-                    <span class="link-name">Others</span>
+                    <span class="link-name" style="--i:2;">Others</span>
                 </a>
             </li>
             <li class="list-item active">
-                <a href="department.php">
+                <a href="">
                     <i class='bx bx-buildings'></i>
-                    <span class="link-name">Department</span>
+                    <span class="link-name" style="--i:3;">Department</span>
                 </a>
             </li>
             <li class="list-item">
                 <a href="terminate.php">
                     <i class='bx bx-folder-minus'></i>
-                    <span class="link-name">Terminate</span>
+                    <span class="link-name" style="--i:4;">Archive</span>
                 </a>
             </li>
             <li class="list-item">
                 <a href="logout.php">
                     <i class='bx bx-log-out'></i>
-                    <span class="link-name">Logout</span>
+                    <span class="link-name" style="--i:5;">Logout</span>
                 </a>
             </li>
         </ul>

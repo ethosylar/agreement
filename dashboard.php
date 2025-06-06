@@ -10,7 +10,7 @@ if (!isset($_SESSION['department'])) {
 
 $department = $_SESSION['department'];
 // Define department
-$dpt = ["ACCIDENT AND EMERGENCY", "ACCOUNTS", "ADMINISTRATION", "AUDIOLOGY","BUSINESS DEVELOPMENT" ,"BUSINESS DEVELOPMENT/OFFICE" ,"BUSINESS OFFICE" ,"CLINICAL SERVICES & CLINICAL QUALITY" ,"CONSULTANT CLINIC" ,"CUSTOMER CARE & EXPERIENCE" ,"CUSTOMER SERVICE" ,"DIAGNOSTIC IMAGING SERVICES" ,"DIETARY" ,"ENDOSCOPY ROOM" ,"FINANCE" ,"HAEMODIALYSIS" ,"HEALTH INFORMATION MANAGEMENT SERVICES" ,"HEALTH SCREENING","HEALTHCARE ENGINEERING SERVICES","HUMAN RESOURCES MANAGEMENT","ICU/CCU/CICU","INFORMATION TECHNOLOGY","KLINIK WAQAF AN-NUR","KPJ WELLNESS SERVICES","MARKETING & CORPORATE COMMUNICATION","MARKETING DEPARTMENT","MATERNITY","MEDICAL OFFICER","MEDICAL RECORDS","MEDICAL WARD","NURSING ADMINISTRATION","OPERATION THEATRE","OPTOMETRIST","OUTSOURCE SERVICES","PAEDIATRIC WARD","PATIENT LIAISON SERVICES","PATIENT SERVICE","PHARMACY","PHYSIOTHERAPY","PREMIER WARD","PUBLIC RELATION DEPARTMENT","PUBLIC RELATIONS AND MARKETING","PURCHASING","QUALITY","RISK & COMPLIANCE SERVICES","SAFETY & HEALTH","SURGICAL WARD"];
+$dpt = ["ACCIDENT AND EMERGENCY", "ACCOUNTS", "ADMINISTRATION", "AUDIOLOGY","BUSINESS OFFICE","CUSTOMER SERVICE EXPERIENCE", "DIAGNOSTIC IMAGING SERVICES" ,"DIETARY" ,"ENDOSCOPY ROOM" ,"HAEMODIALYSIS" ,"HEALTH INFORMATION MANAGEMENT SERVICES" ,"HEALTH SCREENING","HEALTH TOURISM","HEALTHCARE ENGINEERING SERVICES","HUMAN RESOURCES MANAGEMENT","ICU/CCU/CICU","INFORMATION TECHNOLOGY","KLINIK WAQAF AN-NUR","MARKETING & CORPORATE COMMUNICATION","MATERNITY","MEDICAL WARD","NURSING ADMINISTRATION","OPERATION THEATER","OUTSOURCE SERVICES","PAEDIATRIC WARD","PATIENT SERVICES","PHARMACY","PHYSIOTHERAPY","PREMIER WARD","PUBLIC RELATION","PURCHASING","QUALITY","RISK & COMPLIANCE SERVICES","SAFETY & HEALTH","SURGICAL WARD"];
 
 // Function to execute SQL query and return result
 function executeQuery($query) {
@@ -53,6 +53,18 @@ while ($row = $result->fetch_assoc()) {
         $higher3MonthsCount++; // Count contracts with more than 3 months left
     }
 }
+$today = date('Y-m-d');
+$updateQuery = "UPDATE form 
+                SET status = CASE 
+                    WHEN endDate >= ? THEN 'Active' 
+                    ELSE 'Expired' 
+                END 
+                WHERE department = ?";
+
+$updateStmt = $connection->prepare($updateQuery);
+$updateStmt->bind_param("ss", $today, $department);
+$updateStmt->execute();
+$updateStmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -66,39 +78,39 @@ while ($row = $result->fetch_assoc()) {
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" type="x-icon" href="hsptl.png">
     <link rel="stylesheet" href="style.css">
     <style>
         .card-container {
-    display: flex;
-    justify-content: space-between; /* Even spacing */
-    gap: 15px; /* Adds space between cards */
-    padding: 20px;
-}
+        display: flex;
+        justify-content: space-between; /* Even spacing */
+        gap: 15px; /* Adds space between cards */
+        padding: 20px;
+    }
 
-.card-container div {
-    flex: 1; /* Make cards equal width */
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    font-weight: bold;
-}
+        .card-container div {
+            flex: 1; /* Make cards equal width */
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
 
-.over3months {
-    background-color: #FF9A9A; /* Red */
-    color: black;
-}
+        .over3months {
+            background-color: #FF9A9A; /* Red */
+            color: black;
+        }
 
-.lower3months {
-    background-color: #FDFF90; /* Yellow */
-    color: black;
-}
+        .lower3months {
+            background-color: #FDFF90; /* Yellow */
+            color: black;
+        }
 
-.higher3months {
-    background-color: #A5D6A7; /* Green */
-    color: black;
-}
-
+        .higher3months {
+            background-color: #A5D6A7; /* Green */
+            color: black;
+        }
     </style>
     <script>
         $(document).ready(function () {
@@ -115,6 +127,16 @@ while ($row = $result->fetch_assoc()) {
                 $('.sidebar').toggleClass('active');
             });
         });
+            document.querySelectorAll(".list-item").forEach(item => {
+            item.addEventListener("mouseenter", () => {
+                document.querySelector(".sidebar").classList.add("active");
+            });
+
+            item.addEventListener("mouseleave", () => {
+                document.querySelector(".sidebar").classList.remove("active");
+            });
+        });
+
 
         document.addEventListener("DOMContentLoaded", function() {
         const table = document.querySelector(".center-table tbody");
@@ -127,7 +149,7 @@ while ($row = $result->fetch_assoc()) {
             for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
                 const cell = rows[rowIndex].cells[colIndex]; // Get the cell at the specific column index
 
-                if (colIndex === 9) { // Adjust this index if the target column position changes
+                if (colIndex === 11) { // Adjust this index if the target column position changes
                     const monthsLeft = parseInt(cell.textContent.trim(), 10); // Ensure trimming whitespace
 
                     if (!isNaN(monthsLeft)) { // Check if the value is a valid number
@@ -189,7 +211,7 @@ while ($row = $result->fetch_assoc()) {
             <li class="list-item">
                 <a href="terminate.php">
                     <i class='bx bx-folder-minus'></i>
-                    <span class="link-name" style="--i:4;">Terminate</span>
+                    <span class="link-name" style="--i:4;">Archive</span>
                 </a>
             </li>
             <li class="list-item">
@@ -235,13 +257,15 @@ while ($row = $result->fetch_assoc()) {
                     <tr>
                         <th>Department</th>
                         <th>Category</th>
-                        <th>PIC</th>
-                        <th>Service</th>
-                        <th>Company/Act</th>
+                        <th>PIC/Owner Name</th>
+                        <th>Services</th>
+                        <th>Company Name/Act Name</th>
                         <th>Start Date</th>
                         <th>End Date</th>
-                        <th>Rental</th>
+                        <th>Amount(RM)</th>
                         <th>Remarks</th>
+                        <th>Duration</th>
+                        <th>Status</th>
                         <th>Months Left Before End</th>
                         <th>Actions</th>
                     </tr>
@@ -249,7 +273,7 @@ while ($row = $result->fetch_assoc()) {
                 <tbody>
                     <?php
                     // Prepare the SQL statement
-                    $stmt = $connection->prepare("SELECT department,category, pic, service, company, start, endDate, rent, remarks, monthsLeft,filename FROM form WHERE department = ?");
+                    $stmt = $connection->prepare("SELECT status,department,category, pic, service, company, start, endDate, rent, remarks, duration, monthsLeft,filename FROM form WHERE department = ?");
                     if (!$stmt) {
                         die("Prepare failed: " . $connection->error);
                     }
@@ -279,10 +303,12 @@ while ($row = $result->fetch_assoc()) {
                             echo "<td>" . htmlspecialchars($row["pic"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["service"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["company"]) . "</td>";
-                            echo "<td>" . htmlspecialchars($row["start"]) . "</td>";
-                            echo "<td>" . htmlspecialchars($row["endDate"]) . "</td>";
+                            echo "<td>" . date("d/m/Y", strtotime($row["start"])) . "</td>";
+                            echo "<td>" . date("d/m/Y", strtotime($row["endDate"])) . "</td>";
                             echo "<td>" . htmlspecialchars($row["rent"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["remarks"]) . "</td>";
+                            echo "<td>" . htmlspecialchars($row["duration"]) . "</td>";
+                            echo "<td>" . htmlspecialchars($row["status"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["monthsLeft"]) . "</td>";
 
                             // Check if 'filename' exists before accessing it

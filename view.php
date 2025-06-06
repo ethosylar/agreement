@@ -97,9 +97,6 @@ $stmt->close();
             font-size: 40px;
             cursor: pointer; 
             transition: color 0.3s ease, transform 0.5s ease;
-            display: block;
-            text-align: left;
-            margin-bottom: 10px;
         }
         .back-button:hover {
             color: gray;
@@ -114,14 +111,15 @@ $stmt->close();
     <h1>View Record Details</h1>
     <table>
         <tr><th>Category:</th><td><?php echo htmlspecialchars($row['category']); ?></td></tr>
-        <tr><th>PIC:</th><td><?php echo htmlspecialchars($row['pic']); ?></td></tr>
+        <tr><th>PIC/Owner Name:</th><td><?php echo htmlspecialchars($row['pic']); ?></td></tr>
         <tr><th>Services:</th><td><?php echo htmlspecialchars($row['service']); ?></td></tr>
-        <tr><th>Company/Act:</th><td><?php echo htmlspecialchars($row['company']); ?></td></tr>
-        <tr><th>Start Date:</th><td><?php echo htmlspecialchars($row['start']); ?></td></tr>
-        <tr><th>End Date:</th><td><?php echo htmlspecialchars($row['endDate']); ?></td></tr>
+        <tr><th>Company Name/Act Name:</th><td><?php echo htmlspecialchars($row['company']); ?></td></tr>
+        <tr><th>Start Date:</th><td><?php echo date("d/m/Y", strtotime($row["start"])); ?></td></tr>
+        <tr><th>End Date:</th><td><?php echo date("d/m/Y", strtotime($row["endDate"])); ?></td></tr>
         <tr><th>SQFT:</th><td><?php echo htmlspecialchars($row['sqft']); ?></td></tr>
-        <tr><th>Rental:</th><td><?php echo htmlspecialchars($row['rent']); ?></td></tr>
+        <tr><th>Amount(RM):</th><td><?php echo htmlspecialchars($row['rent']); ?></td></tr>
         <tr><th>Remarks:</th><td><?php echo htmlspecialchars($row['remarks']); ?></td></tr>
+        <tr><th>Duration:</th><td><?php echo htmlspecialchars($row['duration']); ?></td></tr>
         <tr><th>Months Left Before Ends:</th><td><?php echo htmlspecialchars($row['monthsLeft']); ?></td></tr>
         <tr><th>Document:</th>
             <td>

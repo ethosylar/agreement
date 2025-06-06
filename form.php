@@ -11,10 +11,10 @@ if (!isset($_SESSION['department'])) {
     exit();
 }
    
-
 // Check if the form has been submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Capture values from the HTML form and sanitize inputs
+    $status = mysqli_real_escape_string($connection, $_POST['status']);
     $category = mysqli_real_escape_string($connection, $_POST['category']);
     $pic = mysqli_real_escape_string($connection, $_POST['pic']);
     $service = mysqli_real_escape_string($connection, $_POST['service']);
@@ -24,7 +24,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sqft = mysqli_real_escape_string($connection, $_POST['sqft']);
     $rent = mysqli_real_escape_string($connection, $_POST['rent']);
     $remarks = mysqli_real_escape_string($connection, $_POST['remarks']);
+    $duration = mysqli_real_escape_string($connection, $_POST['duration']);
     $department = mysqli_real_escape_string($connection, $_SESSION['department']);
+
+    // Convert to d/m/Y format
+    $startFormatted = date('d/m/Y', strtotime($start));
+    $endDateFormatted = date('d/m/Y', strtotime($endDate));
 
     // Calculate months left from the end date
     $endDateTimestamp = strtotime($endDate);
@@ -102,8 +107,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         
         // SQL query to insert data
-        $sql = "INSERT INTO form (category, pic, service, company, start, endDate, sqft, rent, filename, remarks, monthsLeft, department) 
-                VALUES ('$category', '$pic', '$service', '$company', '$start', '$endDate', '$sqft', '$rent', '$file_names_string', '$remarks', '$monthsLeft', '$department')";
+        $sql = "INSERT INTO form (category, pic, service, company, start, endDate, sqft, rent, filename, remarks, monthsLeft, department, status, duration) 
+                VALUES ('$category', '$pic', '$service', '$company', '$start', '$endDate', '$sqft', '$rent', '$file_names_string', '$remarks', '$monthsLeft', '$department', '$status', '$duration')";
 
         // Execute query and handle errors
         if (mysqli_query($connection, $sql)) {
@@ -142,7 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .container {
             max-width: 600px;
-            max-height: 660px;
+            max-height: px;
             margin: 15px auto;
             padding: 30px;
             background-color: white;
@@ -234,21 +239,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <select id="category" name="category" required>
                         <option value="licensing">Licensing</option>
                         <option value="tenant">Tenant</option>
-                        <option value="service">Service</option>
+                        <option value="service">Services</option>
                         <option value="outsource">Outsource</option>
                         <option value="biomedical-facilities">Biomedical Facilities</option>
-                        <option value="marcomm">Marcomm</option>
+                        <option value="marcomm">Marcomm/Insurance</option>
                         <option value="clinical">Clinical</option>
-                        <option value="support">Support</option>
+                        <option value="support">Service & Support Maintenance</option>
                     </select>
                 
-                        <label for="pic">PIC</label>
+                        <label for="pic">PIC/Owner Name</label>
                         <input type="text" name="pic" id="pic" >
                   
-                        <label for="service">Service</label>
+                        <label for="service">Services</label>
                         <input type="text" name="service" id="service" >
                    
-                        <label for="company">Company / Act</label>
+                        <label for="company">Company Name/Act name</label>
                         <input type="text" id="company" name="company" >
                    
                         <label for="start">Start Date</label>
@@ -260,7 +265,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <label for="sqft">SQFT</label>
                         <input type="text" name="sqft" id="sqft" >
                     
-                        <label for="rent">Rental</label>
+                        <label for="rent">Amount(RM)</label>
                         <input type="text" name="rent" id="rent" placeholder="RM" >
                    
                         <label for="file">Upload Files</label>
@@ -271,10 +276,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     
                         <label for="remarks">Remarks</label>
                         <textarea name="remarks" id="remarks"></textarea>
+
+                        <label for="duration">Duration</label>
+                        <textarea name="duration" id="duration"></textarea>
                    
                     <button type="submit" class="btn">Submit</button>
                 </div>
-            
         </div>
     </form>
 </body>

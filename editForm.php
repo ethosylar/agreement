@@ -41,6 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $sqft = htmlspecialchars($_POST['sqft']);
     $rent = htmlspecialchars($_POST['rent']);
     $remarks = htmlspecialchars($_POST['remarks']);
+    $duration = htmlspecialchars($_POST['duration']);
+
 
     // Directory for file uploads
     $target_dir = "uploads/";
@@ -103,8 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Update the database using ID instead of filename
-    $stmt = $connection->prepare("UPDATE form SET category=?, pic=?, service=?, company=?, start=?, endDate=?, sqft=?, rent=?, filename=?, remarks=?, monthsLeft=? WHERE id=? AND department=?");
-    $stmt->bind_param("sssssssssssis", $category, $pic, $service, $company, $start, $endDate, $sqft, $rent, $file_names_string, $remarks, $monthsLeft, $id, $_SESSION['department']);
+    $stmt = $connection->prepare("UPDATE form SET category=?, pic=?, service=?, company=?, start=?, endDate=?, sqft=?, rent=?, filename=?, remarks=?, monthsLeft=?, status=?, duration=? WHERE id=? AND department=?");
+    $stmt->bind_param("sssssssssssisss", $category, $pic, $service, $company, $start, $endDate, $sqft, $rent, $file_names_string, $remarks, $monthsLeft, $status, $duration, $id, $_SESSION['department']);
 
     if ($stmt->execute()) {
         header("Location: view.php?id=" . urlencode($id));
@@ -228,18 +230,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <option value="service" <?php echo ($row['category'] == 'service') ? 'selected' : ''; ?>>Service</option>
             <option value="outsource" <?php echo ($row['category'] == 'outsource') ? 'selected' : ''; ?>>Outsource</option>
             <option value="biomedical-facilities" <?php echo ($row['category'] == 'biomedical-facilities') ? 'selected' : ''; ?>>Marcomm</option>
-            <option value="tenant" <?php echo ($row['category'] == 'marcomm') ? 'selected' : ''; ?>>Marcomm</option>
+            <option value="tenant" <?php echo ($row['category'] == 'marcomm') ? 'selected' : ''; ?>>Marcomm/Insurance</option>
             <option value="clinical" <?php echo ($row['category'] == 'clinical') ? 'selected' : ''; ?>>Clinical</option>
-            <option value="support" <?php echo ($row['category'] == 'support') ? 'selected' : ''; ?>>Support</option>
+            <option value="support" <?php echo ($row['category'] == 'support') ? 'selected' : ''; ?>>Service  Support Maintenance</option>
         </select>
 
-        <label for="pic">PIC:</label>
+        <label for="pic">PIC/Owner Name:</label>
         <input type="text" name="pic" id="pic" value="<?php echo $row['pic']; ?>" >
 
-        <label for="service">Service:</label>
+        <label for="service">Services:</label>
         <input type="text" name="service" id="service" value="<?php echo $row['service']; ?>" >
 
-        <label for="company">Company:</label>
+        <label for="company">Company Name/Act Name:</label>
         <input type="text" name="company" id="company" value="<?php echo $row['company']; ?>" >
 
         <label for="start">Start Date:</label>
@@ -251,11 +253,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <label for="sqft">SQFT:</label>
         <input type="text" name="sqft" id="sqft" value="<?php echo $row['sqft']; ?>" >
 
-        <label for="rent">Rent:</label>
+        <label for="rent">Amount(RM):</label>
         <input type="text" name="rent" id="rent" value="<?php echo $row['rent']; ?>" >
 
         <label for="remarks">Remarks:</label>
         <textarea name="remarks" id="remarks" ><?php echo $row['remarks']; ?></textarea>
+
+        <label for="remarks">Duration:</label>
+        <textarea name="duration" id="duration" ><?php echo $row['duration']; ?></textarea>
 
         <label for="files">Upload Files:</label>
         <input type="file" name="files[]" id="files" value="<?php echo htmlspecialchars($row['file']); ?>" multiple>
@@ -300,6 +305,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <button type="submit" class="btn">Update</button>
     </form>
 </div>
-
 </body>
 </html>

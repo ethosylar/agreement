@@ -18,8 +18,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
 
     if (mysqli_num_rows($result_check) > 0) {
         // Insert terminated record into the terminate table
-        $query_insert = "INSERT INTO terminate (id, department, category, pic, service, company, start, endDate, rent, remarks, termination_date)
-                         SELECT id, department, category, pic, service, company, start, endDate, rent, remarks, NOW() 
+        $query_insert = "INSERT INTO terminate (id, status, department, category, pic, service, company, start, endDate, rent, remarks, duration, termination_date)
+                         SELECT id, status, department, category, pic, service, company, start, endDate, rent, remarks, duration NOW() 
                          FROM form WHERE id = '$id'";
 
         if (mysqli_query($connection, $query_insert)) {
@@ -66,11 +66,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
                 table.column(1).search(selectedDepartment).draw();
             });
 
+            $(document).ready(function () {
+            var table = $('#example').DataTable();
+
+            // Filter table based on category selection
+            $('#categoryFilter').on('change', function () {
+                var selectedCategory = $(this).val();
+                table.column(0).search(selectedCategory).draw();
+            });
+
             // Toggle sidebar
             $('.toggle-btn').click(function () {
                 $('.sidebar').toggleClass('active');
+                });
             });
-        });
+            document.querySelectorAll(".list-item").forEach(item => {
+            item.addEventListener("mouseenter", () => {
+                document.querySelector(".sidebar").classList.add("active");
+            });
+
+            item.addEventListener("mouseleave", () => {
+                document.querySelector(".sidebar").classList.remove("active");
+                });
+            });
 
         document.addEventListener("DOMContentLoaded", function() {
             const table = document.querySelector(".center-table tbody");
@@ -116,7 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
         </ul>
     </div>
 </nav>
-    <div class="wrapper">
+<div class="wrapper">
     <div class="sidebar">
         <div class="logo-menu">
             <h2 class="menu" style="color: white;">Menu</h2>
@@ -142,9 +160,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
                 </a>
             </li>
             <li class="list-item active">
-                <a href="terminate.php">
+                <a href="">
                     <i class='bx bx-folder-minus'></i>
-                    <span class="link-name" style="--i:4;">Terminate</span>
+                    <span class="link-name" style="--i:4;">Archive</span>
                 </a>
             </li>
             <li class="list-item">
@@ -172,23 +190,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Status</th>
                         <th>Department</th>
                         <th>Category</th>
                         <th>PIC</th>
-                        <th>Service</th>
-                        <th>Company/Act</th>
+                        <th>Services</th>
+                        <th>Company Name/Act Name</th>
                         <th>Start Date</th>
                         <th>End Date</th>
-                        <th>Rental</th>
+                        <th>Amount(RM)</th>
                         <th>Remarks</th>
+                        <th>Duration</th>
                         <th>Months Left Before End</th>
                         <th>Action</th>
-
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    $query_terminated = "SELECT id, department, category, pic, service, company, start, endDate, rent, remarks, monthsLeft, filename FROM terminate ORDER BY termination_date DESC";
+                    $query_terminated = "SELECT id,status, department, category, pic, service, company, start, endDate, rent, remarks, duration, monthsLeft,  filename FROM terminate ORDER BY termination_date DESC";
 
                     $result_terminated = mysqli_query($connection, $query_terminated);
                     
@@ -202,6 +221,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
                         while ($row = mysqli_fetch_assoc($result_terminated)) {
                             echo "<tr>";
                             echo "<td>" . htmlspecialchars($row["id"]) . "</td>";
+                            echo "<td>" . htmlspecialchars($row["status"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["department"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["category"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["pic"]) . "</td>";
@@ -211,6 +231,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
                             echo "<td>" . htmlspecialchars($row["endDate"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["rent"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["remarks"]) . "</td>";
+                            echo "<td>" . htmlspecialchars($row["duration"]) . "</td>";
                             echo "<td>" . htmlspecialchars($row["monthsLeft"]) . "</td>";
                             echo "<td>
                             <form action='view3.php' method='get' style='display:inline;'>
@@ -221,7 +242,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
                             echo "</tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='12'>No terminated records found.</td></tr>";
+                        echo "<tr><td colspan='14'>No archive records found.</td></tr>";
                     }
                     ?>
                 </tbody>
