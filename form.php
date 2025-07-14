@@ -146,7 +146,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin: 0;
         }
         .container {
-            max-width: 600px;
+            width: 90%;
+            max-width: 900px;
             max-height: px;
             margin: 15px auto;
             padding: 30px;
@@ -175,17 +176,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             padding: 5px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            width: 80%;
+            width: 100%;
             font-size: 16px;
             background-color: #f9f9f9;
         }
         input[type="date"], input[type="number"] {
-            width: 80%;
+            width: 100%;
         }
         textarea {
             height: 80px;
             resize: none;
-            width: 80%;
+            width: 100%;
         }
 
         .button {

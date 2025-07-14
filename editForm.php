@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $rent = htmlspecialchars($_POST['rent']);
     $remarks = htmlspecialchars($_POST['remarks']);
     $duration = htmlspecialchars($_POST['duration']);
+    $status = isset($_POST['status']) ? htmlspecialchars($_POST['status']) : $row['status'];
 
 
     // Directory for file uploads
@@ -138,7 +139,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             margin: 0;
         }
         .container {
-            max-width: 600px;
+            width: 90%;
+            max-width: 900px;
             margin: 15px auto;
             padding: 30px;
             background-color: white;
@@ -166,17 +168,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             padding: 5px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            width: 80%;
+            width: 100%;
             font-size: 16px;
             background-color: #f9f9f9;
         }
         input[type="date"], input[type="number"] {
-            width: 80%;
+            width: 100%;
         }
         textarea {
             height: 80px;
             resize: none;
-            width: 80%;
+            width: 100%;
         }
         .button {
             background-color: blue;
@@ -263,7 +265,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <textarea name="duration" id="duration" ><?php echo $row['duration']; ?></textarea>
 
         <label for="files">Upload Files:</label>
-        <input type="file" name="files[]" id="files" value="<?php echo htmlspecialchars($row['file']); ?>" multiple>
+        <input type="file" name="files[]" id="files" value="<?php echo htmlspecialchars($row['filename']); ?>" multiple>
 
         <h3>Existing Files:</h3>
         <ul>
@@ -302,6 +304,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </ul>
 
         <input type="hidden" name="file_names_string" value="<?php echo $row['filename']; ?>">
+        <input type="hidden" name="status" value="<?php echo htmlspecialchars($row['status']); ?>">
         <button type="submit" class="btn">Update</button>
     </form>
 </div>
