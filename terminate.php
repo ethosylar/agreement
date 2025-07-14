@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
     if (mysqli_num_rows($result_check) > 0) {
         // Insert terminated record into the terminate table
         $query_insert = "INSERT INTO terminate (id, status, department, category, pic, service, company, start, endDate, rent, remarks, duration, termination_date)
-                         SELECT id, status, department, category, pic, service, company, start, endDate, rent, remarks, duration NOW() 
+                         SELECT id, status, department, category, pic, service, company, start, endDate, rent, remarks, duration, NOW() 
                          FROM form WHERE id = '$id'";
 
         if (mysqli_query($connection, $query_insert)) {
