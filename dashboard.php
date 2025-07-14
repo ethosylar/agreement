@@ -73,6 +73,7 @@ $updateStmt->close();
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dashboard</title>
+
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
@@ -80,6 +81,7 @@ $updateStmt->close();
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" type="x-icon" href="hsptl.png">
+
     <style>
         .card-container {
         display: flex;
@@ -123,17 +125,8 @@ $updateStmt->close();
 
             // Toggle sidebar
             $('.toggle-btn').click(function () {
-                $('.sidebar').toggleClass('active');
             });
         });
-            document.querySelectorAll(".list-item").forEach(item => {
-            item.addEventListener("mouseenter", () => {
-                document.querySelector(".sidebar").classList.add("active");
-            });
-
-            item.addEventListener("mouseleave", () => {
-                document.querySelector(".sidebar").classList.remove("active");
-            });
         });
 
 

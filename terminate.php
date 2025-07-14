@@ -77,17 +77,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
 
             // Toggle sidebar
             $('.toggle-btn').click(function () {
-                $('.sidebar').toggleClass('active');
                 });
             });
-            document.querySelectorAll(".list-item").forEach(item => {
-            item.addEventListener("mouseenter", () => {
-                document.querySelector(".sidebar").classList.add("active");
-            });
-
-            item.addEventListener("mouseleave", () => {
-                document.querySelector(".sidebar").classList.remove("active");
-                });
             });
 
         document.addEventListener("DOMContentLoaded", function() {
