@@ -423,51 +423,13 @@
 		<?php unset($_SESSION['toast_success']); ?>
 		<?php endif; ?>
 		
-		<nav class="navbar">
-			<div class="navdiv">
-				<h2>DEPARTMENT : <?php echo htmlspecialchars($department); ?></h2>
-			</div>
-		</nav>
-		<div class="wrapper">
-			<div class="sidebar">
-				<div class="logo-menu">
-					<h2 class="menu" style="color: white;" >Menu</h2>
-					<i class='bx bx-menu toggle-btn'></i>
-				</div>
-				<ul class="list">
-					<li class="list-item active">
-						<a href="">
-							<i class='bx bx-home'></i>
-							<span class="link-name" style="--i:1;">Dashboard</span>
-						</a>
-					</li>
-					<li class="list-item">
-						<a href="dashboard.php">
-							<i class='bx bx-file'></i>
-							<span class="link-name" style="--i:2;">Others</span>
-						</a>
-					</li>
-					<li class="list-item">
-					<a href="department.php">
-                    <i class='bx bx-buildings'></i>
-                    <span class="link-name" style="--i:3;">Department</span>
-					</a>
-					</li>
-					<li class="list-item">
-					<a href="terminate.php">
-                    <i class='bx bx-folder-minus'></i>
-                    <span class="link-name" style="--i:4;">Archive</span>
-					</a>
-					</li>
-					<li class="list-item">
-					<a href="logout.php">
-                    <i class='bx bx-log-out'></i>
-                    <span class="link-name" style="--i:5;">Logout</span>
-					</a>
-					</li>
-					</ul>
-					</div>
-					
+<?php
+$pageTitle = "Dashboard";
+$headerTitle = "DEPARTMENT : " . htmlspecialchars($department);
+$activePage = "dashboard";
+include "header.php";
+include "sidebar.php";
+?>
 					<div>
 					<div class="filter-container">
 					<label for="categoryFilter" style="color: black;">Category:</label>
@@ -564,8 +526,5 @@
 					
 					</table>
 					</div>
-					</div>
-					</body>
-					</div>
-					</html>
+<?php include "footer.php"; ?>
 										
