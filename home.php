@@ -42,9 +42,13 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Dashboard</title>
-	
-<?php include "assets.php"; ?>
-
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="shortcut icon" type="x-icon" href="hsptl.png">
+		
 		<style>
 			* {
             margin: 0;
@@ -353,51 +357,59 @@
 			}
 		</style>
 		<script>
-			
-			$(document).ready(function () {
-				var table = $('#example').DataTable();
-				
-				// Filter table based on category selection
-				$('#categoryFilter').on('change', function () {
-					var selectedCategory = $(this).val();
-					table.column(0).search(selectedCategory).draw();
-				});
-				
-				// Toggle sidebar
-				$('.toggle-btn').click(function () {
-				});
-			});
-			});
-			
-			document.addEventListener("DOMContentLoaded", function() {
-				const table = document.querySelector(".center-table tbody");
-				const rows = table.querySelectorAll("tr");
-				
-				// Assuming the table is rectangular (each row has the same number of cells)
-				const columnCount = rows[0].cells.length;
-				
-				for (let colIndex = 0; colIndex < columnCount; colIndex++) {
-					for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-						const cell = rows[rowIndex].cells[colIndex]; // Get the cell at the specific column index
-						
-						if (colIndex === 10) { // Adjust this index if the target column position changes
-							const monthsLeft = parseInt(cell.textContent.trim(), 10); // Ensure trimming whitespace
-							
-							if (!isNaN(monthsLeft)) { // Check if the value is a valid number
-								if (monthsLeft < 3 && monthsLeft >= 0) {
-									cell.classList.add("lower3months");
-									} else if (monthsLeft >= 3) {
-									cell.classList.add("higher3months");
-									} else {
-									cell.classList.add("over3months");
-								}
-								} else {
-								console.warn("Invalid monthsLeft value in cell:", cell.textContent);
-							}
-						}
-					}
-				}
-			});
+        $(document).ready(function () {
+            var table = $('#example').DataTable();
+
+            // Filter table based on category selection
+            $('#categoryFilter').on('change', function () {
+                var selectedCategory = $(this).val();
+                table.column(0).search(selectedCategory).draw();
+            });
+
+            // Toggle sidebar
+            $('.toggle-btn').click(function () {
+                $('.sidebar').toggleClass('active');
+            });
+        });
+            document.querySelectorAll(".list-item").forEach(item => {
+            item.addEventListener("mouseenter", () => {
+                document.querySelector(".sidebar").classList.add("active");
+            });
+
+            item.addEventListener("mouseleave", () => {
+                document.querySelector(".sidebar").classList.remove("active");
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+        const table = document.querySelector(".center-table tbody");
+        const rows = table.querySelectorAll("tr");
+
+        // Assuming the table is rectangular (each row has the same number of cells)
+        const columnCount = rows[0].cells.length;
+
+        for (let colIndex = 0; colIndex < columnCount; colIndex++) {
+            for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+                const cell = rows[rowIndex].cells[colIndex]; // Get the cell at the specific column index
+
+                if (colIndex === 10) { // Adjust this index if the target column position changes
+                    const monthsLeft = parseInt(cell.textContent.trim(), 10); // Ensure trimming whitespace
+
+                    if (!isNaN(monthsLeft)) { // Check if the value is a valid number
+                        if (monthsLeft < 3 && monthsLeft >= 0) {
+                            cell.classList.add("lower3months");
+                        } else if (monthsLeft >= 3) {
+                            cell.classList.add("higher3months");
+                        } else {
+                            cell.classList.add("over3months");
+                        }
+                    } else {
+                        console.warn("Invalid monthsLeft value in cell:", cell.textContent);
+                    }
+                }
+            }
+        }
+    });
 		</script>
 	</head>
 	<body>

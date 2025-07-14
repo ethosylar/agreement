@@ -33,8 +33,14 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Departments</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.0.7/css/boxicons.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="shortcut icon" type="x-icon" href="hsptl.png">
+    <link rel="stylesheet" href="style.css">
 
-<?php include "assets.php"; ?>
 		
 		<style>
 			
@@ -98,28 +104,35 @@
 			}
 		</style>
 		<script>
-			$(document).ready(function() {
-				// Toggle sidebar
-				$('.toggle-btn').click(function() {
-				});
-				
-				// View Records button
-				$('.view-records-btn').click(function() {
-					var department = $(this).data('department');
-					$.ajax({
-						url: 'record.php',
-						method: 'POST',
-						data: { department: department },
-						success: function(response) {
-							$('#recordsModal .modal-body').html(response);
-							$('#recordsModal').modal('show');
-						},
-						error: function() {
-							alert('Failed to load records. Please try again.');
-						}
-					});
-				});
-			});
+        $(document).ready(function () {
+            var table = $('#example').DataTable();
+
+            // Filter table based on category selection
+            $('#categoryFilter').on('change', function () {
+                var selectedCategory = $(this).val();
+                table.column(0).search(selectedCategory).draw();
+            });
+
+            // Toggle sidebar
+            $('.toggle-btn').click(function () {
+                $('.sidebar').toggleClass('active');
+            });
+        });
+
+            // Handle View Records button click
+            $('.view-records-btn').on('click', function () {
+                var department = $(this).data('department');
+                $.ajax({
+                    url: 'record.php',
+                    method: 'POST',
+                    data: { department: department },
+                    success: function (response) {
+                        $('#recordsModal .modal-body').html(response);
+                        $('#recordsModal').modal('show');
+                    }
+                });
+            });
+        });
 		</script>
 		
 	</head>
