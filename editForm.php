@@ -9,8 +9,7 @@ if (!isset($_SESSION['department'])) {
 
 include 'dbconn.php';
 
-$id = isset($_GET['id']) ? $_GET['id'] : '';
-
+$id = $_GET['id'] ?? '';
 if (empty($id)) {
     header("Location: home.php");
     exit();
@@ -29,284 +28,243 @@ if ($result->num_rows === 0) {
 
 $row = $result->fetch_assoc();
 
-// If form is submitted, update the record
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Collect and sanitize form data
+// Initialize existing_files for GET
+$existing_files = !empty($row['filename'])
+    ? array_map('trim', explode(',', $row['filename']))
+    : [];
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Sanitize inputs
     $category = htmlspecialchars($_POST['category']);
-    $pic = htmlspecialchars($_POST['pic']);
-    $service = htmlspecialchars($_POST['service']);
-    $company = htmlspecialchars($_POST['company']);
-    $start = htmlspecialchars($_POST['start']);
-    $endDate = htmlspecialchars($_POST['endDate']);
-    $sqft = htmlspecialchars($_POST['sqft']);
-    $rent = htmlspecialchars($_POST['rent']);
-    $remarks = htmlspecialchars($_POST['remarks']);
+    $pic      = htmlspecialchars($_POST['pic']);
+    $service  = htmlspecialchars($_POST['service']);
+    $company  = htmlspecialchars($_POST['company']);
+    $start    = htmlspecialchars($_POST['start']);
+    $endDate  = htmlspecialchars($_POST['endDate']);
+    $sqft     = htmlspecialchars($_POST['sqft']);
+    $rent     = htmlspecialchars($_POST['rent']);
+    $remarks  = htmlspecialchars($_POST['remarks']);
     $duration = htmlspecialchars($_POST['duration']);
-    $status = isset($_POST['status']) ? htmlspecialchars($_POST['status']) : $row['status'];
+    $status   = $row['status']; // keep existing status
 
-
-    // Directory for file uploads
     $target_dir = "uploads/";
-    $existing_files = !empty($row['filename']) ? explode(',', $row['filename']) : [];
 
-    // Handle file removal
-    $files_to_remove = isset($_POST['remove_files']) ? $_POST['remove_files'] : [];
-    foreach ($files_to_remove as $file) {
-        $file_path = $target_dir . basename($file);
-        if (file_exists($file_path)) {
-            unlink($file_path);
-        }
-        $existing_files = array_filter($existing_files, function ($f) use ($file) {
-            return $f !== $file;
-        });
+    // Remove checked files
+    $to_remove = $_POST['remove_files'] ?? [];
+    foreach ($to_remove as $file) {
+        $path = $target_dir . basename($file);
+        if (file_exists($path)) unlink($path);
+        $existing_files = array_filter($existing_files, fn($f)=> $f!==$file);
     }
 
-    $new_file_names = [];
-
-    // Handle new file uploads
-    if (!empty($_FILES["files"]["name"][0])) {
-        foreach ($_FILES["files"]["name"] as $key => $name) {
-            $target_file = $target_dir . basename($name);
-            $file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-
-            // Validate file type
-            $allowed_types = ["jpg", "jpeg", "png", "gif", "pdf", "docx", "doc"];
-            if (!in_array($file_type, $allowed_types)) {
-                echo "Invalid file type: $name.";
-                exit();
-            }
-
-            // Check file size
-            if ($_FILES["files"]["size"][$key] > 5000000) {
-                echo "File too large: $name.";
-                exit();
-            }
-
-            // Upload the file
-            if (move_uploaded_file($_FILES["files"]["tmp_name"][$key], $target_file)) {
-                $new_file_names[] = $name;
-            } else {
-                echo "Error uploading file: $name.";
-                exit();
+    // Upload new files
+    $new_files = [];
+    if (!empty($_FILES['files']['name'][0])) {
+        $allowed = ['jpg','jpeg','png','gif','pdf','docx','doc'];
+        foreach ($_FILES['files']['name'] as $i => $name) {
+            $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowed, true)) continue;
+            if ($_FILES['files']['size'][$i] > 5_000_000) continue;
+            $dst = $target_dir . basename($name);
+            if (move_uploaded_file($_FILES['files']['tmp_name'][$i], $dst)) {
+                $new_files[] = $name;
             }
         }
     }
 
-    // Merge existing and new files
-    $all_file_names = array_merge($existing_files, $new_file_names);
-    $file_names_string = !empty($all_file_names) ? implode(',', $all_file_names) : NULL;
+    // Merge filenames
+    $all = array_merge($existing_files, $new_files);
+    $filenames = $all ? implode(',', $all) : NULL;
 
-    // Calculate months left
-    $endDateObj = new DateTime($endDate);
-    $currentDateObj = new DateTime();
-    $interval = $endDateObj->diff($currentDateObj);
-    $monthsLeft = $interval->m + ($interval->y * 12);
-    if ($endDateObj < $currentDateObj) {
-        $monthsLeft = -$monthsLeft;
-    }
+    // Calculate monthsLeft
+    $endObj = new DateTime($endDate);
+    $now   = new DateTime();
+    $diff  = $endObj->diff($now);
+    $monthsLeft = $diff->m + ($diff->y*12);
+    if ($endObj < $now) $monthsLeft = -$monthsLeft;
 
-    // Update the database using ID instead of filename
-    $stmt = $connection->prepare("UPDATE form SET category=?, pic=?, service=?, company=?, start=?, endDate=?, sqft=?, rent=?, filename=?, remarks=?, monthsLeft=?, status=?, duration=? WHERE id=? AND department=?");
-    $stmt->bind_param("sssssssssssisss", $category, $pic, $service, $company, $start, $endDate, $sqft, $rent, $file_names_string, $remarks, $monthsLeft, $status, $duration, $id, $_SESSION['department']);
-
-    if ($stmt->execute()) {
-        header("Location: view.php?id=" . urlencode($id));
+    // Update record
+    $upd = $connection->prepare(
+      "UPDATE form SET
+         category=?, pic=?, service=?, company=?,
+         start=?, endDate=?, sqft=?, rent=?,
+         filename=?, remarks=?, monthsLeft=?,
+         status=?, duration=?
+       WHERE id=? AND department=?"
+    );
+    $upd->bind_param(
+      'ssssssssssissis',
+      $category,
+      $pic,
+      $service,
+      $company,
+      $start,
+      $endDate,
+      $sqft,
+      $rent,
+      $filenames,
+      $remarks,
+      $monthsLeft,
+      $status,
+      $duration,
+      $id,
+      $_SESSION['department']
+    );
+    if ($upd->execute()) {
+        header("Location: view.php?id=".urlencode($id));
         exit();
     } else {
-        echo "Error updating record: " . $stmt->error;
+        echo "Error updating record: " . $upd->error;
     }
-
-    $stmt->close();
+    $upd->close();
     $connection->close();
 }
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" type="x-icon" href="hsptl.png">
-    <title>Update Record</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f7fafc;
-            color: #333;
-            margin: 0;
-        }
-        .container {
-            width: 90%;
-            max-width: 900px;
-            margin: 15px auto;
-            padding: 30px;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            font-size: 28px;
-            color: #444;
-            margin-bottom: 20px;
-        }
-        form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        label {
-            font-weight: 600;
-            margin-bottom: -30px;
-            margin-left: 50px;
-            color: #555;
-        }
-        input, textarea, select {
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            width: 100%;
-            font-size: 16px;
-            background-color: #f9f9f9;
-        }
-        input[type="date"], input[type="number"] {
-            width: 100%;
-        }
-        textarea {
-            height: 80px;
-            resize: none;
-            width: 100%;
-        }
-        .button {
-            background-color: blue;
-            color: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            padding: 10px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .btn {
-            background-color: blue;
-            color: white;
-            padding: 5px 20px;
-            border-radius: 15px;
-            cursor: pointer;
-            text-align: center;
-            font-size: 16px;
-            transition: background 0.3s ease;
-            grid-column: span 2;
-        }
-        .btn:hover {
-            background: #fff;
-            color: grey;
-        }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Update Agreement</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <style>
+    body { font-family:'Segoe UI',sans-serif; background:#f7fafc; margin:0; }
+    .container {
+      width:90%; max-width:900px; margin:15px auto; padding:30px;
+      background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 { text-align:center; color:#444; margin-bottom:10px; }
+    .required-note {
+      grid-column:1/3; margin-left:50px;
+      color:#555; font-size:.9rem; margin-bottom:15px;
+    }
+    form { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    label { font-weight:600; margin-left:50px; color:#555; }
+    .required-star { color:red; margin-left:4px; }
+    input, select, textarea {
+      padding:5px; border:1px solid #ddd; border-radius:8px;
+      width:100%; font-size:16px; background:#f9f9f9;
+    }
+    textarea { height:80px; resize:none; }
+    .btn {
+      grid-column:span 2; background:blue; color:#fff; padding:10px;
+      border:none; border-radius:15px; cursor:pointer;
+      transition:background .3s;
+    }
+    .btn:hover { background:#fff; color:grey; }
+    .back-button {
+      background:none; border:none; font-size:40px; cursor:pointer;
+      transition:transform .3s;
+    }
+    .back-button:hover { transform:scale(1.2); color:#aaa; }
 
-        .back-button {
-            background-color: transparent;
-            border: none;
-            color: black;
-            font-size: 40px;
-            cursor: pointer; 
-            transition: color 0.3s ease, transform 0.5s ease;
-        }
-        .back-button:hover{
-          color: rgb(208, 208, 208, 1.0);
-          transform: scale(1.4);
-        }
-    </style>
+    /* Existing files */
+    .existing-files { grid-column:1/3; margin-top:20px; }
+    .existing-files > label {
+      display:flex; align-items:center; margin-left:50px; color:#555;
+    }
+    .existing-files .note {
+      margin-left:50px; color:#555; font-size:.9rem; margin-bottom:10px;
+    }
+    .file-row {
+      display:flex; justify-content:space-between;
+      align-items:center; margin:0 50px 5px;
+    }
+  </style>
 </head>
 <body>
-
-<div class="container">
-    <a onclick="history.back()" class="back-button" type="button"><i class='bx bx-arrow-back'></i></a>
-    <h1>Update Record</h1>
+  <div class="container">
+    <button onclick="history.back()" class="back-button">
+      <i class="bx bx-arrow-back"></i>
+    </button>
+    <h1>Update Agreement</h1>
+    <p class="required-note">
+      <span class="required-star">*</span> Required fields
+    </p>
     <form method="POST" enctype="multipart/form-data">
-        <label for="category">Category:</label>
-        <select name="category" id="category" required>
-            <option value="licensing" <?php echo ($row['category'] == 'licensing') ? 'selected' : ''; ?>>Licensing</option>
-            <option value="tenant" <?php echo ($row['category'] == 'tenant') ? 'selected' : ''; ?>>Tenant</option>
-            <option value="service" <?php echo ($row['category'] == 'service') ? 'selected' : ''; ?>>Service</option>
-            <option value="outsource" <?php echo ($row['category'] == 'outsource') ? 'selected' : ''; ?>>Outsource</option>
-            <option value="biomedical-facilities" <?php echo ($row['category'] == 'biomedical-facilities') ? 'selected' : ''; ?>>Marcomm</option>
-            <option value="tenant" <?php echo ($row['category'] == 'marcomm') ? 'selected' : ''; ?>>Marcomm/Insurance</option>
-            <option value="clinical" <?php echo ($row['category'] == 'clinical') ? 'selected' : ''; ?>>Clinical</option>
-            <option value="support" <?php echo ($row['category'] == 'support') ? 'selected' : ''; ?>>Service  Support Maintenance</option>
-        </select>
+      <label for="category">
+        Category<span class="required-star">*</span>:
+      </label>
+      <select name="category" id="category" required>
+        <option value="licensing"      <?= $row['category']=='licensing'?'selected':'' ?>>Licensing</option>
+        <option value="tenant"         <?= $row['category']=='tenant'   ?'selected':'' ?>>Tenant</option>
+        <option value="service"        <?= $row['category']=='service'  ?'selected':'' ?>>Service</option>
+        <option value="outsource"      <?= $row['category']=='outsource'?'selected':'' ?>>Outsource</option>
+        <option value="biomedical-facilities" <?= $row['category']=='biomedical-facilities'?'selected':'' ?>>Marcomm</option>
+        <option value="marcomm"        <?= $row['category']=='marcomm'  ?'selected':'' ?>>Marcomm/Insurance</option>
+        <option value="clinical"       <?= $row['category']=='clinical' ?'selected':'' ?>>Clinical</option>
+        <option value="support"        <?= $row['category']=='support'  ?'selected':'' ?>>Support Mtn.</option>
+      </select>
 
-        <label for="pic">PIC/Owner Name:</label>
-        <input type="text" name="pic" id="pic" value="<?php echo $row['pic']; ?>" >
+      <label for="pic">
+        PIC/Owner Name<span class="required-star">*</span>:
+      </label>
+      <input type="text" name="pic" id="pic" value="<?= htmlspecialchars($row['pic']) ?>" required>
 
-        <label for="service">Services:</label>
-        <input type="text" name="service" id="service" value="<?php echo $row['service']; ?>" >
+      <label for="service">
+        Services<span class="required-star">*</span>:
+      </label>
+      <input type="text" name="service" id="service" value="<?= htmlspecialchars($row['service']) ?>" required>
 
-        <label for="company">Company Name/Act Name:</label>
-        <input type="text" name="company" id="company" value="<?php echo $row['company']; ?>" >
+      <label for="company">
+        Company Name/Act Name<span class="required-star">*</span>:
+      </label>
+      <input type="text" name="company" id="company" value="<?= htmlspecialchars($row['company']) ?>" required>
 
-        <label for="start">Start Date:</label>
-        <input type="date" name="start" id="start" value="<?php echo $row['start']; ?>" >
+      <label for="start">
+        Start Date<span class="required-star">*</span>:
+      </label>
+      <input type="date" name="start" id="start" value="<?= $row['start'] ?>" required>
 
-        <label for="endDate">End Date:</label>
-        <input type="date" name="endDate" id="endDate" value="<?php echo $row['endDate']; ?>" >
+      <label for="endDate">
+        End Date<span class="required-star">*</span>:
+      </label>
+      <input type="date" name="endDate" id="endDate" value="<?= $row['endDate'] ?>" required>
 
-        <label for="sqft">SQFT:</label>
-        <input type="text" name="sqft" id="sqft" value="<?php echo $row['sqft']; ?>" >
+      <label for="sqft">SQFT:</label>
+      <input type="text" name="sqft" id="sqft" value="<?= htmlspecialchars($row['sqft']) ?>">
 
-        <label for="rent">Amount(RM):</label>
-        <input type="text" name="rent" id="rent" value="<?php echo $row['rent']; ?>" >
+      <label for="rent">
+        Amount (RM)<span class="required-star">*</span>:
+      </label>
+      <input type="text" name="rent" id="rent" value="<?= htmlspecialchars($row['rent']) ?>" required>
 
-        <label for="remarks">Remarks:</label>
-        <textarea name="remarks" id="remarks" ><?php echo $row['remarks']; ?></textarea>
+      <label for="remarks">Remarks:</label>
+      <textarea name="remarks" id="remarks"><?= htmlspecialchars($row['remarks']) ?></textarea>
 
-        <label for="remarks">Duration:</label>
-        <textarea name="duration" id="duration" ><?php echo $row['duration']; ?></textarea>
+      <label for="duration">Duration:</label>
+      <textarea name="duration" id="duration"><?= htmlspecialchars($row['duration']) ?></textarea>
 
-        <label for="files">Upload Files:</label>
-        <input type="file" name="files[]" id="files" value="<?php echo htmlspecialchars($row['filename']); ?>" multiple>
+      <label for="files">Upload Files:</label>
+      <input type="file" name="files[]" id="files" multiple>
 
-        <h3>Existing Files:</h3>
-        <ul>
-            <?php
-            $file_path = ''; // Initialize to avoid undefined variable notice
-            if (isset($_POST['remove_files']) && !empty($_POST['remove_files'])) {
-                $files_to_remove = $_POST['remove_files'];
-                foreach ($files_to_remove as $file) {
-                    $file_path = $target_dir . basename($file);
-                    if (file_exists($file_path)) {
-                        unlink($file_path); // Remove the file from the server
-                    }
-                }
-            }
+      <!-- Existing Files -->
+      <div class="existing-files">
+        <label>
+          Existing Files<span class="required-star">*</span>:
+        </label>
+        <p class="note">
+          Check the box next to any file you want to remove before clicking “Update.”
+        </p>
+        <?php if (empty($existing_files)): ?>
+          <p class="note">No existing files.</p>
+        <?php else: ?>
+          <?php foreach ($existing_files as $file): ?>
+            <div class="file-row">
+              <span><?= htmlspecialchars($file) ?></span>
+              <label>
+                <input type="checkbox" name="remove_files[]" value="<?= htmlspecialchars($file) ?>">
+                Remove
+              </label>
+            </div>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </div>
 
-            if (isset($_POST['remove_files']) && !empty($_POST['remove_files'])) {
-                $files_to_remove = $_POST['remove_files'];
-                foreach ($files_to_remove as $file) {
-                    $file_path = $target_dir . basename($file);
-                    if (file_exists($file_path)) {
-                        unlink($file_path); // Remove the file from the server
-                    } else {
-                        echo "File does not exist: $file_path<br>"; // Debugging output
-                    }
-                }
-            } else {
-                echo "No files to remove.<br>"; // Debugging output
-            }
-
-
-            $existing_files = explode(',', $row['filename']);
-            foreach ($existing_files as $file) {
-                echo "<li>$file <input type='checkbox' name='remove_files[]' value='" . htmlspecialchars($file) . "'> Remove</li>";
-            }
-            ?>
-        </ul>
-
-        <input type="hidden" name="file_names_string" value="<?php echo $row['filename']; ?>">
-        <input type="hidden" name="status" value="<?php echo htmlspecialchars($row['status']); ?>">
-        <button type="submit" class="btn">Update</button>
+      <input type="hidden" name="status" value="<?= htmlspecialchars($row['status']) ?>">
+      <button type="submit" class="btn">Update</button>
     </form>
-</div>
+  </div>
 </body>
 </html>
