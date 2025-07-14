@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_pass = $_POST['user_pass'];
 
     // Use prepared statements to prevent SQL injection
-    $stmt = $connection->prepare("SELECT department FROM depart WHERE department = ? AND user_pass = ?");
+    $stmt = $connection->prepare("SELECT department FROM depart WHERE user_id = ? AND user_pass = ?");
     $stmt->bind_param("ss", $department, $user_pass);
     $stmt->execute();
     $result = $stmt->get_result();
