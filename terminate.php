@@ -45,13 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Terminated Records</title>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
-    <link href='https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css' rel='stylesheet'>
-    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="shortcut icon" type="x-icon" href="hsptl.png">
-    <link rel="stylesheet" href="style.css">
+<?php include "assets.php"; ?>
     <script>
         $(document).ready(function () {
             var table = $('#example').DataTable({
@@ -77,17 +71,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
 
             // Toggle sidebar
             $('.toggle-btn').click(function () {
-                $('.sidebar').toggleClass('active');
                 });
             });
-            document.querySelectorAll(".list-item").forEach(item => {
-            item.addEventListener("mouseenter", () => {
-                document.querySelector(".sidebar").classList.add("active");
-            });
-
-            item.addEventListener("mouseleave", () => {
-                document.querySelector(".sidebar").classList.remove("active");
-                });
             });
 
         document.addEventListener("DOMContentLoaded", function() {

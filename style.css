@@ -316,3 +316,21 @@
             color: black; /* Change to your desired hover color */
         }
         
+/* Dashboard card styles */
+.card-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 20px;
+}
+.card-container div {
+    flex: 1;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.modal-xl {
+    max-width: 95%;
+}
