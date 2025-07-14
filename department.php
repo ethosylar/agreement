@@ -104,36 +104,26 @@
 			}
 		</style>
 		<script>
-        $(document).ready(function () {
-            var table = $('#example').DataTable();
+  $(function(){
+    // sidebar toggle
+    $('.toggle-btn').click(function(){
+      $('.sidebar').toggleClass('active');
+    });
 
-            // Filter table based on category selection
-            $('#categoryFilter').on('change', function () {
-                var selectedCategory = $(this).val();
-                table.column(0).search(selectedCategory).draw();
-            });
-
-            // Toggle sidebar
-            $('.toggle-btn').click(function () {
-                $('.sidebar').toggleClass('active');
-            });
+    // View Records via AJAX + show Bootstrap modal
+    $('.view-records-btn').on('click', function(){
+      var dept = $(this).data('department');
+      $.post('record.php', { department: dept })
+        .done(function(html){
+          $('#recordsModal .modal-body').html(html);
+          $('#recordsModal').modal('show');
+        })
+        .fail(function(){
+          alert('Failed to load records.');
         });
-
-            // Handle View Records button click
-            $('.view-records-btn').on('click', function () {
-                var department = $(this).data('department');
-                $.ajax({
-                    url: 'record.php',
-                    method: 'POST',
-                    data: { department: department },
-                    success: function (response) {
-                        $('#recordsModal .modal-body').html(response);
-                        $('#recordsModal').modal('show');
-                    }
-                });
-            });
-        });
-		</script>
+    });
+  });
+</script>
 		
 	</head>
 	<body>
