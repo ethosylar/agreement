@@ -1,80 +1,80 @@
 <?php
-session_start();
-include("dbconn.php");
-
-// Check if user is logged in
-if (!isset($_SESSION['department'])) {
-    echo "<script>
-            alert('You must be logged in to view this page.');
-            window.location.href='index.php';
-          </script>";
-    exit();
-}
-
-// Get the filename from the URL parameter (can be empty)
-$id = isset($_GET['id']) ? $_GET['id'] : '';
-
-// Prepare SQL statement to fetch the record (handles NULL filenames correctly)
-$stmt = $connection->prepare("SELECT * FROM form WHERE (id = ? OR filename IS NULL) AND department = ?");
-$stmt->bind_param("is", $id, $_SESSION['department']);
-$stmt->execute();
-$result = $stmt->get_result();
-
-// Check if the record exists
-if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-} else {
-    echo "<script>alert('No data found for this entry.'); window.location.href='home.php';</script>";
-    exit();
-}
-
-$stmt->close();
+	session_start();
+	include("dbconn.php");
+	
+	// Check if user is logged in
+	if (!isset($_SESSION['department'])) {
+		echo "<script>
+		alert('You must be logged in to view this page.');
+		window.location.href='index.php';
+		</script>";
+		exit();
+	}
+	
+	// Get the filename from the URL parameter (can be empty)
+	$id = isset($_GET['id']) ? $_GET['id'] : '';
+	
+	// Prepare SQL statement to fetch the record (handles NULL filenames correctly)
+	$stmt = $connection->prepare("SELECT * FROM form WHERE (id = ? OR filename IS NULL) AND department = ?");
+	$stmt->bind_param("is", $id, $_SESSION['department']);
+	$stmt->execute();
+	$result = $stmt->get_result();
+	
+	// Check if the record exists
+	if ($result->num_rows > 0) {
+		$row = $result->fetch_assoc();
+		} else {
+		echo "<script>alert('No data found for this entry.'); window.location.href='home.php';</script>";
+		exit();
+	}
+	
+	$stmt->close();
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="shortcut icon" type="x-icon" href="hsptl.png">
-    <title>View Record</title>
-    <style>
-        body {
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+		<link rel="shortcut icon" type="x-icon" href="hsptl.png">
+		<title>View Record</title>
+		<style>
+			body {
             font-family: Arial, sans-serif;
             background-color: #f0f4f8;
-        }
-        .container {
+			}
+			.container {
             max-width: 700px;
             margin: 5px auto;
             padding: 15px;
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-        }
-        h1 {
+			}
+			h1 {
             text-align: center;
             color: #333;
-        }
-        table {
+			}
+			table {
             width: 90%;
             border-collapse: collapse;
             margin: 10px auto;
-        }
-        table th, table td {
+			}
+			table th, table td {
             text-align: left;
             padding: 8px;
             border-bottom: 1px solid #ddd;
-        }
-        table th {
+			}
+			table th {
             background-color: #f5f5f5;
             width: 40%;
-        }
-        .action-buttons {
+			}
+			.action-buttons {
             text-align: center;
             margin-top: 20px;
-        }
-        .btn {
+			}
+			.btn {
             background: blue;
             color: white;
             padding: 8px 20px;
@@ -86,77 +86,97 @@ $stmt->close();
             cursor: pointer;
             transition: background 0.3s ease;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .btn:hover {
+			}
+			.btn:hover {
             background: darkblue;
-        }
-        .back-button {
+			}
+			.back-button {
             background-color: transparent;
             border: none;
             color: black;
             font-size: 40px;
             cursor: pointer; 
             transition: color 0.3s ease, transform 0.5s ease;
-        }
-        .back-button:hover {
+			}
+			.back-button:hover {
             color: gray;
             transform: scale(1.4);
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <a href="home.php" class="back-button"><i class='bx bx-arrow-back'></i></a>
-    <h1>View Record Details</h1>
-    <table>
-        <tr><th>Category:</th><td><?php echo htmlspecialchars($row['category']); ?></td></tr>
-        <tr><th>PIC/Owner Name:</th><td><?php echo htmlspecialchars($row['pic']); ?></td></tr>
-        <tr><th>Services:</th><td><?php echo htmlspecialchars($row['service']); ?></td></tr>
-        <tr><th>Company Name/Act Name:</th><td><?php echo htmlspecialchars($row['company']); ?></td></tr>
-        <tr><th>Start Date:</th><td><?php echo date("d/m/Y", strtotime($row["start"])); ?></td></tr>
-        <tr><th>End Date:</th><td><?php echo date("d/m/Y", strtotime($row["endDate"])); ?></td></tr>
-        <tr><th>SQFT:</th><td><?php echo htmlspecialchars($row['sqft']); ?></td></tr>
-        <tr><th>Amount(RM):</th><td><?php echo htmlspecialchars($row['rent']); ?></td></tr>
-        <tr><th>Remarks:</th><td><?php echo htmlspecialchars($row['remarks']); ?></td></tr>
-        <tr><th>Duration:</th><td><?php echo htmlspecialchars($row['duration']); ?></td></tr>
-        <tr><th>Months Left Before Ends:</th><td><?php echo htmlspecialchars($row['monthsLeft']); ?></td></tr>
-        <tr><th>Document:</th>
-            <td>
-                <?php
-                if (!empty($row['filename'])) {
-                    // Handle multiple filenames (comma-separated)
-                    $file_names = preg_split('/\s*,\s*/', $row['filename']);
-                    echo "<ul>";
-                    foreach ($file_names as $file_name) {
-                        echo "<li><a href='uploads/" . htmlspecialchars($file_name) . "' download>" . htmlspecialchars($file_name) . "</a></li>";
-                    }
-                    echo "</ul>";
-                } else {
-                    echo "<p style='color: red;'>No document available.</p>";
-                }
-                ?>
-            </td>
-        </tr>
-    </table>
-
-    <div class="action-buttons">
-        <a href="editForm.php?id=<?php echo urlencode($row['id']); ?>" class="btn btn-warning">Update</a>
-        <a href="javascript:void(0);" onclick="confirmDelete('<?php echo urlencode($row['filename']); ?>')" class="btn btn-danger">Delete</a>
-    </div>
-</div>
-
-<script>
-    function confirmDelete(filename) {
-        if (confirm("Are you sure you want to delete this data?")) {
-            window.location.href = 'deleteForm.php?filename=' + filename;
-        }
-    }
-</script>
-
-</body>
+			}
+		</style>
+	</head>
+	<body>
+		
+		<div class="container">
+			<a href="home.php" class="back-button"><i class='bx bx-arrow-back'></i></a>
+			<h1>View Record Details</h1>
+			<table>
+				<tr><th>Category:</th><td><?php echo htmlspecialchars($row['category']); ?></td></tr>
+				<tr><th>PIC/Owner Name:</th><td><?php echo htmlspecialchars($row['pic']); ?></td></tr>
+				<tr><th>Services:</th><td><?php echo htmlspecialchars($row['service']); ?></td></tr>
+				<tr><th>Company Name/Act Name:</th><td><?php echo htmlspecialchars($row['company']); ?></td></tr>
+				<tr><th>Start Date:</th><td><?php echo date("d/m/Y", strtotime($row["start"])); ?></td></tr>
+				<tr><th>End Date:</th><td><?php echo date("d/m/Y", strtotime($row["endDate"])); ?></td></tr>
+				<tr><th>SQFT:</th><td><?php echo htmlspecialchars($row['sqft']); ?></td></tr>
+				<tr><th>Amount(RM):</th><td><?php echo htmlspecialchars($row['rent']); ?></td></tr>
+				<tr>
+					<th>Remarks:</th>
+					<td>
+						<?php
+							// take the raw string (which contains literal “\r\n”)
+							$raw = $row['remarks'];
+							// turn “\r\n” into actual newlines
+							$unescaped = stripcslashes($raw);
+							// escape HTML, then convert newlines to <br>
+							echo nl2br(htmlspecialchars($unescaped));
+						?>
+					</td>
+				</tr>
+				<tr><th>Duration:</th><td><?php echo htmlspecialchars($row['duration']); ?></td></tr>
+				<tr><th>Months Left Before Ends:</th><td><?php echo htmlspecialchars($row['monthsLeft']); ?></td></tr>
+				<tr><th>Document:</th>
+				  <td>
+					<?php
+					  if (!empty($row['filename'])) {
+						// Build path under uploads/<department>/
+						$dept = htmlspecialchars($row['department']);
+						$file_names = preg_split('/\s*,\s*/', $row['filename']);
+						echo "<ul>";
+						foreach ($file_names as $file_name) {
+						  $safeName = htmlspecialchars($file_name);
+						  // point into the department folder
+						  $url = "uploads/{$dept}/{$safeName}";
+						  echo "<li><a href='{$url}' download>{$safeName}</a></li>";
+						}
+						echo "</ul>";
+					  } else {
+						echo "<p style='color: red;'>No document available.</p>";
+					  }
+					?>
+				  </td>
+				</tr>
+			</table>
+			
+			<div class="action-buttons">
+				<a href="editForm.php?id=<?php echo urlencode($row['id']); ?>" class="btn btn-warning">Update</a>
+				<?php if (isset($_SESSION['username']) && $_SESSION['username'] === 'azean'): ?>
+				<a href="javascript:void(0);"
+				onclick="confirmDelete('<?= (int)$row['id'] ?>')"
+				class="btn btn-danger">Delete</a>
+				<?php endif; ?>
+			</div>
+		</div>
+		
+		<script>
+			function confirmDelete(filename) {
+				if (confirm("Are you sure you want to delete this data?")) {
+					window.location.href = 'deleteForm.php?id=' + encodeURIComponent(id);
+				}
+			}
+		</script>
+		
+	</body>
 </html>
 
 <?php
-$connection->close();
+	$connection->close();
 ?>

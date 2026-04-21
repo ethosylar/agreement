@@ -1,321 +1,373 @@
- /* CSS styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+/* CSS styles */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Poppins', sans-serif;
+}
 
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background-size: cover;
-            background-position: center;
-            color: white;
-        }
+body {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	background-size: cover;
+	background-position: center;
+	color: white;
+}
 
-        /* Logo */
-        .logo {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 70px;
-        }
+/* Logo */
+.logo {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	width: 70px;
+}
 
-        /* Table Styles */
-        .center-table {
-            display: flex;
-            justify-content: center;
-            background-color: rgba(240, 240, 240, 0.5);
-            color: black;
-            margin-top: 30px;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            overflow-x: visible;
-        }
+/* Table Styles */
+.center-table {
+	display: flex;
+	justify-content: center;
+	background-color: rgba(240, 240, 240, 0.5);
+	color: black;
+	margin-top: 30px;
+	border-radius: 20px;
+	padding: 20px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	overflow-x: visible;
+}
 
-        .container {
-            padding-top: 40px;
-            width: 85%;
-            margin: 0 auto;
-            flex: 1;
-        }
+.container {
+	padding-top: 40px;
+	width: 85%;
+	margin: 0 auto;
+	flex: 1;
+	margin-left: 80px;
+	transition: margin-left .3s ease;
+}
 
-        #example_wrapper {
-            width: 100%;
-            overflow-x: visible;
-        }
+body.sidebar-expanded .container {
+  margin-left: 260px;
+}
 
-        #example {
-            width: 100%;
-            padding-top: 10px;
-            color: black;
-            table-layout: fixed;
-        }
+#example_wrapper {
+	width: 100%;
+	overflow-x: visible;
+}
 
-        #example th,
-        #example td {
-            border: 1px solid #ddd;
-            text-align: center;
-            overflow-wrap: break-word;
-            word-wrap: break-word;
-            padding: 12px;
-            font-size: 14px;
-        }
+#example {
+	width: 100%;
+	padding-top: 10px;
+	color: black;
+	table-layout: fixed;
+}
 
-        .lower3months {
-            background-color: #FDFF90;
-        }
-        .higher3months {
-            background-color: #9EFBA8;
-        }
-        .over3months {
-            background-color: #FF9A9A;
-        }
+#example th,
+#example td {
+	border: 1px solid #ddd;
+	text-align: center;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	padding: 12px;
+	font-size: 14px;
+}
 
-        /* Button Styles */
-        .button {
-            background-color: blue;
-            color: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            padding: 10px;
-            cursor: pointer;
-            text-decoration: none;
-        }
+.lower3months {
+	background-color: #FDFF90;
+}
+.higher3months {
+	background-color: #9EFBA8;
+}
+.over3months {
+	background-color: #FF9A9A;
+}
 
-        .btn {
-            background: blue;
-            color: white;
-            font-size: 1.2em;
-            padding: 5px 20px;
-            text-decoration: none;
-            border-radius: 20px;
-        }
+/* Button Styles */
+.button {
+	background-color: blue;
+	color: white;
+	border-radius: 20px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	padding: 10px;
+	cursor: pointer;
+	text-decoration: none;
+}
 
-        .btn:hover {
-            background: #fff;
-            color: grey;
-        }
+.btn {
+	background: blue;
+	color: white;
+	font-size: 1.2em;
+	padding: 5px 20px;
+	text-decoration: none;
+	border-radius: 20px;
+}
 
-        /* Misc Styles */
-        h1 {
-            color: black;
-            text-shadow: 0 0 5px #999;
-            font-size: 50px;
-            text-align: center;
-        }
+.btn:hover {
+	background: #fff;
+	color: grey;
+}
 
-        .dataTables_filter input[type="search"] {
-            background-color: white;
-            color: black;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 5px;
-            box-shadow: none;
-            max-width: 150px;
-        }
+/* Misc Styles */
+h1 {
+	color: black;
+	text-shadow: 0 0 5px #999;
+	font-size: 50px;
+	text-align: center;
+}
 
-        .dataTables_filter input[type="search"]:focus {
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-        }
+.dataTables_filter input[type="search"] {
+	background-color: white;
+	color: black;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	padding: 5px;
+	box-shadow: none;
+	max-width: 150px;
+}
 
-        .filter-container {
-            display: flex;
-            justify-content: flex-end ;
-        }
+.dataTables_filter input[type="search"]:focus {
+	box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
 
-        .dataTables_filter {
-            display: flex;
-            align-items: center;
-        }
+.filter-container {
+	display: flex;
+	justify-content: flex-end ;
+}
 
-        #departmentFilter {
-            margin-left: 10px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: white;
-            color: black;
-        }
+.dataTables_filter {
+	display: flex;
+	align-items: center;
+}
 
-        .wrapper {
-            display: flex;
-            margin: 15px auto;
-            flex-direction: column;
-            align-items: center;
-            width: 85%;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
-        }
+#departmentFilter {
+	margin-left: 10px;
+	padding: 5px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	background-color: white;
+	color: black;
+}
 
-        h3 {
-            color:black;
-            text-align: center;
-            width: 100%;
-        }
+.wrapper {
+	display: flex;
+	margin: 15px auto;
+	flex-direction: column;
+	align-items: center;
+	width: 85%;
+	padding: 20px;
+	background: white;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+}
 
-        .navbar {
-            background: white;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+h3 {
+	color:black;
+	text-align: center;
+	width: 100%;
+}
 
-        .navbar .navdiv {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
+.navbar {
+	margin-left: 80px;
+	background: white;
+	position: relative;
+	padding: 20px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	width: calc(100% - 80px);
+	transition: margin-left .3s ease, width .3s ease;
+	z-index: 5;
+}
 
-        .navbar .navdiv h2 {
-            font-size: 30px;
-            font-weight: 600;
-            color: black;
-            margin: 0;
-        }
+body.sidebar-expanded .navbar {
+  margin-left: 260px;               /* match your expanded sidebar width */
+  width: calc(100% - 260px);
+}
 
-        .navbar .navdiv .breadcrumb {
-            display: flex;
-            align-items: center;
-            list-style: none;
-            padding: 0;
-        }
+.navbar .navdiv {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	gap: 1rem;
+}
 
-        .navbar .navdiv .breadcrumb li {
-            margin: 0 10px;
-            color: grey;
-        }
+.navbar .navdiv h2 {
+	font-size: 30px;
+	font-weight: 600;
+	color: black;
+	margin: 0;
+}
 
-        .navbar .navdiv .breadcrumb li a {
-            text-decoration: none;
-            color: grey;
-        }
+.navbar .navdiv .breadcrumb {
+	display: flex;
+	align-items: center;
+	list-style: none;
+	padding: 0;
+}
 
-        .navbar .navdiv .breadcrumb li a.active {
-            color: blue;
-        }
-        
-        /* Sidebar Styles */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 80px;
-            height: 100%;
-            background-color: blue;
-            backdrop-filter: blur(50px);
-            border-right: 2px solid rgba(225, 225, 255, 0.2);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            padding: 6px 14px;
-            transition: width 0.5s ease;
-            z-index: 10;
-        }
+.navbar .navdiv .breadcrumb li {
+	margin: 0 10px;
+	color: grey;
+}
 
-        .sidebar.active {
-            width: 260px;
-        }
+.navbar .navdiv .breadcrumb li a {
+	text-decoration: none;
+	color: grey;
+}
 
-        .sidebar .logo-menu {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            height: 70px;
-        }
+.navbar .navdiv .breadcrumb li a.active {
+	color: blue;
+}
 
-        .sidebar .logo-menu .menu {
-            font-size: 25px;
-            color: black;
-            pointer-events: none;
-            opacity: 0;
-            transition: 0.3s;
-        }
+/* Sidebar Styles */
+.sidebar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 80px;
+	height: 100%;
+	background-color: blue;
+	backdrop-filter: blur(50px);
+	border-right: 2px solid rgba(225, 225, 255, 0.2);
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	padding: 6px 14px;
+	transition: width 0.5s ease;
+	z-index: 10;
+}
 
-        .sidebar.active .logo-menu .menu {
-            opacity: 1;
-            transition-delay: 0.2s;
-        }
+.sidebar.active {
+	width: 260px;
+}
 
-        .sidebar .logo-menu .toggle-btn {
-            position: absolute;
-            top: 20px; /* Adjusted top for better alignment */
-            left: 25%; /* Adjusts correctly when sidebar is active */
-            width: 40px;
-            height: 40px;
-            font-size: 22px;
-            color: white;
-            text-align: center;
-            line-height: 40px;
-            cursor: pointer;
-            transition: 0.5s;
-            z-index: 100; /* Ensure it stays on top */
-        }
+.sidebar .logo-menu {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: 70px;
+}
 
-        .sidebar.active .logo-menu .toggle-btn {
-            left: 80%; /* Adjusted for the active sidebar */
-        }
+.sidebar .logo-menu .menu {
+	font-size: 25px;
+	color: black;
+	pointer-events: none;
+	opacity: 0;
+	transition: 0.3s;
+}
 
-        .sidebar .list {
-            margin-top: 10px;
-        }
+.sidebar.active .logo-menu .menu {
+	opacity: 1;
+	transition-delay: 0.2s;
+}
 
-        .sidebar .list .list-item {
-            list-style: none;
-            width: 100%;
-            height: 50px;
-            margin: 5px 0;
-            line-height: 50px;
-        }
+.sidebar .logo-menu .toggle-btn {
+	position: absolute;
+	top: 20px; /* Adjusted top for better alignment */
+	left: 25%; /* Adjusts correctly when sidebar is active */
+	width: 40px;
+	height: 40px;
+	font-size: 22px;
+	color: white;
+	text-align: center;
+	line-height: 40px;
+	cursor: pointer;
+	transition: 0.5s;
+	z-index: 100; /* Ensure it stays on top */
+}
 
-        .sidebar .list .list-item a {
-            display: flex;
-            align-items: center;
-            font-size: 18px;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: background 0.5s;
-        }
+.sidebar.active .logo-menu .toggle-btn {
+	left: 80%; /* Adjusted for the active sidebar */
+}
 
-        .sidebar .list .list-item.active a,
-        .sidebar .list .list-item a:hover {
-            background: rgba(255, 255, 255, 0.6);
-        }
+.sidebar .list {
+	margin-top: 10px;
+}
 
-        .sidebar .list .list-item a i {
-            min-width: 50px;
-            height: 50px;
-            text-align: center;
-            line-height: 50px;
-        }
+.sidebar .list .list-item {
+	list-style: none;
+	width: 100%;
+	height: 50px;
+	margin: 5px 0;
+	line-height: 50px;
+	position: relative;
+}
 
-        .sidebar .link-name {
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
+.sidebar .list .list-item a {
+	display: flex;
+	align-items: center;
+	font-size: 18px;
+	color: white;
+	text-decoration: none;
+	border-radius: 6px;
+	transition: background 0.5s;
+}
 
-        .sidebar.active .link-name {
-            opacity: 1;
-            pointer-events: auto;
-            transition-delay: calc(0.1s * var(--i));
-        }
+.sidebar .list .list-item.active a,
+.sidebar .list .list-item a:hover {
+	background: rgba(255, 255, 255, 0.6);
+}
 
-        .sidebar .list-item:hover ~ .sidebar {
-            width: 260px;
-        }
-        
-        .sidebar .list-item:hover .link-name {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .sidebar .list-item a:hover .link-name {
-            color: black; /* Change to your desired hover color */
-        }
-        
+.sidebar .list .list-item a i {
+	min-width: 50px;
+	height: 50px;
+	text-align: center;
+	line-height: 50px;
+}
+
+.sidebar .link-name {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 4px 10px;
+  margin-left: 8px;
+  background: rgba(255,255,255,0.9);
+  color: #000;
+  border-radius: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  font-size: 0.9rem;
+}
+
+.sidebar.active .link-name {
+  /* reset positioning so text flows inline */
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+
+  /* make them always visible */
+  opacity: 1;
+  visibility: visible;
+
+  /* styling to match your expanded look */
+  background: none;
+  color: white;            /* or whatever your expanded text color is */
+  padding: 0;
+  margin: 0 0 0 16px;       /* indent a bit from the icon */
+  pointer-events: auto;
+  white-space: normal;      /* allow wrapping if needed */
+  font-size: 1rem;          /* your normal menu font size */
+}
+
+.sidebar .list-item:hover ~ .sidebar {
+	width: 260px;
+}
+
+.sidebar .list-item:hover .link-name {
+  opacity: 1;
+  visibility: visible;
+}
+.sidebar .list-item a:hover .link-name {
+  display: inline-block;                /* make padding effective */
+  background-color: rgba(255,255,255,0.9);
+  color: #000;
+  padding: 4px 8px;
+  border-radius: 4px;
+  /* subtle text outline for extra legibility */
+  -webkit-text-stroke: 1px rgba(0,0,0,0.5);
+  text-stroke: 1px rgba(0,0,0,0.5);
+}
+
 /* Dashboard card styles */
 .card-container {
     display: flex;
@@ -333,4 +385,31 @@
 
 .modal-xl {
     max-width: 95%;
+}
+
+.over3months {
+	background-color: #FF9A9A; /* Red */
+	color: black;
+}
+
+.lower3months {
+	background-color: #FDFF90; /* Yellow */
+	color: black;
+}
+
+.higher3months {
+	background-color: #A5D6A7; /* Green */
+	color: black;
+}
+.card-columns .card {
+  background-color: #f7f7f7;   /* light gray */
+  border: 1px solid #ddd;      /* subtle border */
+  border-radius: 8px;
+  color: #000; 
+}
+.card-columns .card .card-title {
+  color: #000;              /* ensure headings are black */
+}
+.modal-header .modal-title {
+  color: #000 !important;
 }
