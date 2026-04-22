@@ -1,7 +1,7 @@
 <?php
 // MySQL database connection
 $user = "root"; // MySQL username
-$pass = "root@123"; // MySQL password
+$pass = ""; // MySQL password
 $host = "localhost"; // Server name or IP address
 $dbname = "intern"; // Database name
 

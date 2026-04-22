@@ -31,13 +31,13 @@
 		if ($result->num_rows === 0) {
 			// login failed
 			write_audit(
-				$connection,
-				$department,
-				'',
-				'LOGIN_FAILURE',
-				'depart',
-				0,
-				['attempted_user' => $department]              // ✅ array
+			$connection,
+			$department,
+			'',
+			'LOGIN_FAILURE',
+			'depart',
+			0,
+			['attempted_user' => $department]              // ✅ array
 			);
 			echo "<script>
             alert('You are not registered.');
@@ -50,13 +50,13 @@
 			$_SESSION['username']   = $sid['user_id'];
 			
 			write_audit(
-				$connection,
-				$sid['user_id'],
-				$sid['department'],
-				'LOGIN_SUCCESS',
-				'depart',
-				0,
-				['user_id' => $sid['user_id']]
+			$connection,
+			$sid['user_id'],
+			$sid['department'],
+			'LOGIN_SUCCESS',
+			'depart',
+			0,
+			['user_id' => $sid['user_id']]
 			);
 			
 			header("Location: home.php");
@@ -65,42 +65,44 @@
 		$stmt->close();
 	}
 	
-		function write_audit(
+	function write_audit(
     mysqli $conn,
     string $user,
     string $dept,
     string $action,
     string $table_name,
-    int    $record_id,
-    array  $data = []
-) {
-    $ip   = $_SERVER['REMOTE_ADDR']     ?? '';
-    $ua   = $_SERVER['HTTP_USER_AGENT'] ?? '';
-    $json = json_encode($data, JSON_UNESCAPED_UNICODE);
-
-    $stmt = $conn->prepare(<<<'SQL'
+    int $record_id,
+    array $data = []
+	) {
+		$ip   = $_SERVER['REMOTE_ADDR'] ?? '';
+		$ua   = $_SERVER['HTTP_USER_AGENT'] ?? '';
+		$json = json_encode($data, JSON_UNESCAPED_UNICODE);
+		
+		if ($json === false) {
+			$json = '{}';
+		}
+		
+		$stmt = $conn->prepare("
         INSERT INTO audit_log
-          (user_id, department, action, table_name, record_id, changed_data, ip_address, user_agent)
-        VALUES
-          (?,       ?,          ?,      ?,          ?,         CAST(? AS JSON), ?,          ?)
-    SQL
-    );
-
-    // ⚠️ HERE is the fix: 4×s, 1×i, 3×s
-    $stmt->bind_param(
-      "ssssisss",
-      $user,
-      $dept,
-      $action,
-      $table_name,
-      $record_id,
-      $json,
-      $ip,
-      $ua
-    );
-    $stmt->execute();
-    $stmt->close();
-}
+        (user_id, department, action, table_name, record_id, changed_data, ip_address, user_agent)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+		");
+		
+		$stmt->bind_param(
+        "ssssisss",
+        $user,
+        $dept,
+        $action,
+        $table_name,
+        $record_id,
+        $json,
+        $ip,
+        $ua
+		);
+		
+		$stmt->execute();
+		$stmt->close();
+	}
 	
 	$connection->close();
 ?>
@@ -123,64 +125,63 @@
             border-radius: 5px;
             text-align: center;
             color: black;
-		}
-		
-		.over3months {
-		background-color: #FF9A9A;
-		padding: 10px;
-		margin: 10px 0;
-		border-radius: 5px;
-		text-align: center;
-		font-weight: bold;
-		color: black;
-		}
+			}
+			
+			.over3months {
+			background-color: #FF9A9A;
+			padding: 10px;
+			margin: 10px 0;
+			border-radius: 5px;
+			text-align: center;
+			font-weight: bold;
+			color: black;
+			}
 		</style>
-		</head>
-		<body>
+	</head>
+	<body>
 		<img class="hospital">
 		<div class="container">
-		<div class="img">
-		<img src="img/hospital.svg" alt="Hospital">
-		</div>
-		<div class="login-content">
-		<form name="form" method="POST" action="index.php">
-		<img src="img/avatar.svg" alt="Avatar">
-		<h2 class="title">Welcome</h2>
-		
-		<?php if ($near_expiry > 0): ?>
-		<div class="lower3months">
-		⚠️ <b><?php echo $near_expiry; ?></b> contract(s) expiring in less than 3 months!
-		</div>
-		<?php endif; ?>
-		
-		<?php if ($overdue > 0): ?>
-		<div class="over3months">
-		❌ <b><?php echo $overdue; ?></b> contract(s) are OVERDUE!
-		</div>
-		<?php endif; ?>
-		
-		<div class="input-div one">
-		<div class="i">
-		<i class="fas fa-user"></i>
-		</div>
-		<div class="div">
-		<input type="text" class="form-control" name="department" placeholder="Enter username" required>
-		</div>
-		</div>
-		<div class="input-div pass">
-		<div class="i"> 
-		<i class="fas fa-lock"></i>
-		</div>
-		<div class="div">
-		<h5>Password</h5>
-		<input type="password" class="input" name="user_pass" required>
-		</div>
-		</div>
-		<button type="submit" name="hantar" class="btn">Login</button>
-		</form>
-		</div>
+			<div class="img">
+				<img src="img/hospital.svg" alt="Hospital">
+			</div>
+			<div class="login-content">
+				<form name="form" method="POST" action="index.php">
+					<img src="img/avatar.svg" alt="Avatar">
+					<h2 class="title">Welcome</h2>
+					
+					<?php if ($near_expiry > 0): ?>
+					<div class="lower3months">
+						⚠️ <b><?php echo $near_expiry; ?></b> contract(s) expiring in less than 3 months!
+					</div>
+					<?php endif; ?>
+					
+					<?php if ($overdue > 0): ?>
+					<div class="over3months">
+						❌ <b><?php echo $overdue; ?></b> contract(s) are OVERDUE!
+					</div>
+					<?php endif; ?>
+					
+					<div class="input-div one">
+						<div class="i">
+							<i class="fas fa-user"></i>
+						</div>
+						<div class="div">
+							<input type="text" class="form-control" name="department" placeholder="Enter username" required>
+						</div>
+					</div>
+					<div class="input-div pass">
+						<div class="i"> 
+							<i class="fas fa-lock"></i>
+						</div>
+						<div class="div">
+							<h5>Password</h5>
+							<input type="password" class="input" name="user_pass" required>
+						</div>
+					</div>
+					<button type="submit" name="hantar" class="btn">Login</button>
+				</form>
+			</div>
 		</div>
 		<script type="text/javascript" src="main.js"></script>
-		</body>
-		</html>
-				
+	</body>
+</html>

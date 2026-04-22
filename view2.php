@@ -20,7 +20,7 @@
 	
 	// 3) Prepare SQL: if user is azean, fetch by id only;
 	//    otherwise enforce department match
-	if (isset($_SESSION['username']) && $_SESSION['username'] === 'azean') {
+	if (isset($_SESSION['username']) && ($_SESSION['username']==='azean' || $_SESSION['username']==='itservices')) {
 		$sql = "SELECT * FROM form WHERE id = ?";
 		$stmt = $connection->prepare($sql);
 		$stmt->bind_param("i", $id);

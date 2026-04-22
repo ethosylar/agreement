@@ -3,7 +3,7 @@ session_start();
 include 'dbconn.php';
 
 // only azean may view audits
-if (!isset($_SESSION['username']) || $_SESSION['username'] !== 'azean') {
+if (!isset($_SESSION['username']) && ($_SESSION['username']==='azean' || $_SESSION['username']==='itservices')) {
     header('Location: home.php');
     exit;
 }

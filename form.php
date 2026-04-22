@@ -139,27 +139,41 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 // 9) Write audit helper
-function write_audit( mysqli $conn, string $user, string $dept,
-                      string $action, string $table_name,
-                      int $record_id, array $data = [] )
-{
-    $ip   = $_SERVER['REMOTE_ADDR']     ?? '';
+function write_audit(
+    mysqli $conn,
+    string $user,
+    string $dept,
+    string $action,
+    string $table_name,
+    int $record_id,
+    array $data = []
+) {
+    $ip   = $_SERVER['REMOTE_ADDR'] ?? '';
     $ua   = $_SERVER['HTTP_USER_AGENT'] ?? '';
     $json = json_encode($data, JSON_UNESCAPED_UNICODE);
 
-    $stmt = $conn->prepare(<<<'SQL'
+    if ($json === false) {
+        $json = '{}';
+    }
+
+    $stmt = $conn->prepare("
         INSERT INTO audit_log
-          (user_id, department, action, table_name, record_id,
-           changed_data, ip_address, user_agent)
-        VALUES
-          (?,?,?,?,?,CAST(? AS JSON),?,?)
-    SQL
-    );
+        (user_id, department, action, table_name, record_id, changed_data, ip_address, user_agent)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+
     $stmt->bind_param(
-        "ssssisss",
-        $user, $dept, $action, $table_name,
-        $record_id, $json, $ip, $ua
+        'ssssisss',
+        $user,
+        $dept,
+        $action,
+        $table_name,
+        $record_id,
+        $json,
+        $ip,
+        $ua
     );
+
     $stmt->execute();
     $stmt->close();
 }

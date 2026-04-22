@@ -1,6 +1,6 @@
 <?php
   $active = $activePage ?? '';
-  $isAdmin = isset($_SESSION['username']) && $_SESSION['username']==='azean';
+  $isAdmin = isset($_SESSION['username']) && ($_SESSION['username']==='azean' || $_SESSION['username']==='itservices');
 ?>
 <div class="sidebar">
   <div class="logo-menu">
